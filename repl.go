@@ -87,6 +87,10 @@ func startRepl(cfg *config) {
 
 		reader.Scan()
 
+		if reader.Err() != nil {
+			continue
+		}
+
 		words := cleanInput(reader.Text())
 
 		if len(words) == 0 {
