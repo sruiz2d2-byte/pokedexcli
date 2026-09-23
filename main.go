@@ -1,11 +1,9 @@
 package main
 
-import (
-	"fmt"
-)
-
 func main() {
+	cfg := config{
+		commands: getCommands(),
+	}
 
-	fmt.Print("Hello World")
-
+	startRepl(&cfg)
 }
