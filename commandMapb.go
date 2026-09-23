@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, _ ...string) error {
 	if cfg.previous == nil {
 		fmt.Println("You're on the first page")
 		return nil

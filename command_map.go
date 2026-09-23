@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, _ ...string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 
 	// Si ya existe una página siguiente, usar esa URL

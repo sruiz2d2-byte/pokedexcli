@@ -5,30 +5,33 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/sruiz2d2-byte/pokedexcli/internal/pokecache"
 )
 
 type config struct {
 	commands map[string]cliCommand
-
 	next     *string
 	previous *string
+	cache    *pokecache.Cache
+	pokedex  map[string]Pokemon
 }
 
 type LocationAreasResponse struct {
-	Next     *string
-	Previous *string
-	Results  []LocationArea
+	Next     *string        `json:"next"`
+	Previous *string        `json:"previous"`
+	Results  []LocationArea `json:"results"`
 }
 
 type LocationArea struct {
-	Name string
-	URL  string
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -53,6 +56,26 @@ func getCommands() map[string]cliCommand {
 			description: "Displays previous location areas",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explore a location area",
+			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Catch a Pokemon",
+			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a caught Pokemon",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Displays all caught Pokemon",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -61,6 +84,7 @@ func startRepl(cfg *config) {
 
 	for {
 		fmt.Print("Pokedex > ")
+
 		reader.Scan()
 
 		words := cleanInput(reader.Text())
@@ -70,6 +94,7 @@ func startRepl(cfg *config) {
 		}
 
 		commandName := words[0]
+		args := words[1:]
 
 		command, exists := cfg.commands[commandName]
 
@@ -78,7 +103,7 @@ func startRepl(cfg *config) {
 			continue
 		}
 
-		err := command.callback(cfg)
+		err := command.callback(cfg, args...)
 
 		if err != nil {
 			fmt.Println(err)
@@ -88,6 +113,5 @@ func startRepl(cfg *config) {
 
 func cleanInput(text string) []string {
 	output := strings.ToLower(text)
-	words := strings.Fields(output)
-	return words
+	return strings.Fields(output)
 }
